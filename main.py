@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk, ImageGrab, ImageFont, ImageDraw
 
 
@@ -14,6 +14,12 @@ def image_upload():
     selected_img = Image.open(image_path)
     try:
         if selected_img:
+            #enable widgets:
+            text_position.config(state="normal")
+            watermark_text.config(state="normal")
+            watermark_entry.config(state="normal")
+
+
             width, height = selected_img.size
             canvas.config(width=width,height=height)
             canvas.place(relx=0.5, rely=0.5, anchor=CENTER)
@@ -52,29 +58,37 @@ def add_watermark():
 
     elif menu.get() == 'Bottom Right':
         x= width - 300
-        y= height -50
+        y= height - 50
     else:
         x= width /2 - text_width / 2
         y= height-text_height -300
 
-    draw_obj.text((x,y), watermark_text,fill=(255,255,255, 120), font=font)
+    draw_obj.text((x,y), watermark_text,fill=(255,255,255, 140), font=font)
     watermarked = Image.alpha_composite(image, text_image)
 
     watermarked_image = ImageTk.PhotoImage(watermarked)
     canvas.create_image(0, 0, image=watermarked_image, anchor="nw")
-
+    save_img.config(state="normal")
 
 
 def save_image():
-    x= window.winfo_rootx() + canvas.winfo_x()
-    y =window.winfo_rooty() + canvas.winfo_y()
-    x1 = x + canvas.winfo_width()
-    y1 = y + canvas.winfo_height()
-    image_new_name = f"{image_name}+watermarked.jpg"
-    file_location = filedialog.askdirectory(title="Save new images to...")
+    try:
+        if image_name:
+            x= window.winfo_rootx() + canvas.winfo_x()
+            y =window.winfo_rooty() + canvas.winfo_y()
+            x1 = x + canvas.winfo_width()
+            y1 = y + canvas.winfo_height()
+            image_new_name = f"{image_name}+watermarked.jpg"
+            file_location = filedialog.askdirectory(title="Save new images to...")
 
-    grab_image = ImageGrab.grab(bbox=(x, y, x1, y1))
-    grab_image.save(f"{file_location}/{image_new_name}")
+            grab_image = ImageGrab.grab(bbox=(x, y, x1, y1))
+            grab_image.save(f"{file_location}/{image_new_name}")
+
+            messagebox.showinfo('File Saved', "Image saved in your system")
+
+    except FileNotFoundError:
+        print("please, Select Image File")
+
 
 window = Tk()
 window.title("Watermark Application")
@@ -94,8 +108,9 @@ canvas.grid(row=0, column=0)
 select_img = Button(window, text="📂",command=image_upload,bg='yellow green', font=('Arial',15))
 select_img.place(x=1100, y=680)
 
-save_img = Button(window, text="💾",command=save_image,bg='light green', font=('Arial',15))
+save_img = Button(window, text="💾",command=save_image,bg='light green', font=('Arial',15),state="disabled")
 save_img.place(x=1150, y=680)
+
 
 position = ["Top Left", "Top Right","Center","Bottom Left","Bottom Right"]
 menu= StringVar(window)
@@ -106,15 +121,15 @@ menu.set("Select Text Position")
 
 text_position = OptionMenu(window, menu, *position)
 text_position.place(x=550,y=683)
-text_position.config(font=('Arial',14), bg='tomato')
+text_position.config(font=('Arial',14), bg='tomato', state="disabled")
 
 
-
-watermark_text = Button(window, text='Add', font=('Arial',15,'bold'), bg='SlateBlue4', command=add_watermark, width=10)
+watermark_text = Button(window, text='Add', font=('Arial',15,'bold'), bg='SlateBlue4', command=add_watermark, width=10,state="disabled")
 watermark_text.place(x=395, y=680)
 
-watermark_entry = Entry(width=20, font=('Arial',15), border=2, borderwidth=2)
+watermark_entry = Entry(width=20, font=('Arial',15), border=2, borderwidth=2, state="disabled")
 watermark_entry.place(x=150, y=688)
+
 
 
 
