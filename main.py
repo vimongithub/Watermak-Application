@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk, ImageGrab, ImageFont, ImageDraw
+from idlelib.tooltip import Hovertip
 
 
 def image_upload():
@@ -89,10 +90,13 @@ def save_image():
     except FileNotFoundError:
         print("please, Select Image File")
 
+def quit_app():
+    window.destroy()
 
 window = Tk()
 window.title("Watermark Application")
-window.config(bg="grey")
+window.config(bg="grey23")
+
 
 screen_height = window.winfo_screenheight()
 screen_width = window.winfo_screenwidth()
@@ -100,38 +104,40 @@ screen_width = window.winfo_screenwidth()
 window.geometry(f'{screen_width}x{screen_height}')
 window.resizable(False, False)
 
+fevicon_image = PhotoImage(file='image/fevicon.png')
+window.iconphoto(False,fevicon_image)
 
 
 canvas = Canvas(window, height=screen_height - 100, width=screen_width, background="blanched almond", highlightthickness=0)
-canvas.grid(row=0, column=0)
+bg_image = PhotoImage(file="image/Vimal's Watermark App.png")
+canvas.create_image(683,335,image=bg_image, anchor="center")
+canvas.grid()
 
-select_img = Button(window, text="📂",command=image_upload,bg='yellow green', font=('Arial',15))
-select_img.place(x=1100, y=680)
+watermark_entry = Entry(width=20, font=('Arial',15), border=2, borderwidth=2, state="disabled")
+watermark_entry.place(x=310, y=688)
 
-save_img = Button(window, text="💾",command=save_image,bg='light green', font=('Arial',15),state="disabled")
-save_img.place(x=1150, y=680)
+watermark_text = Button(window, text='Add Text', font=('Arial',15,'bold'), bg='RoyalBlue1', command=add_watermark, width=10, state="disabled", fg="white")
+watermark_text.place(x=550, y=680)
+
 
 
 position = ["Top Left", "Top Right","Center","Bottom Left","Bottom Right"]
 menu= StringVar(window)
 menu.set("Select Text Position")
 
-
-#Create a dropdown Menu
-
 text_position = OptionMenu(window, menu, *position)
-text_position.place(x=550,y=683)
-text_position.config(font=('Arial',14), bg='tomato', state="disabled")
+text_position.place(x=720,y=683)
+text_position.config(font=('Arial',14), bg='MediumPurple4', fg="white", state="disabled")
 
 
-watermark_text = Button(window, text='Add', font=('Arial',15,'bold'), bg='SlateBlue4', command=add_watermark, width=10,state="disabled")
-watermark_text.place(x=395, y=680)
+select_img = Button(window, text="📂",command=image_upload,bg='yellow green', font=('Arial',18))
+select_img.place(x=1000, y=680)
+img_tip = Hovertip(select_img, "Select Image file from your system")
 
-watermark_entry = Entry(width=20, font=('Arial',15), border=2, borderwidth=2, state="disabled")
-watermark_entry.place(x=150, y=688)
+save_img = Button(window, text="💾",command=save_image,bg='light green', font=('Arial',18),state="disabled")
+save_img.place(x=1060, y=680)
+save_img_tip=Hovertip(save_img, "Click to save your watermarked image")
 
-
-
-
-
+quit_app = Button(window, text='❌', font=('Arial',18), fg="red", command=quit_app, bg='grey15')
+quit_app.place(x=1290, y=680)
 window.mainloop()
